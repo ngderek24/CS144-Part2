@@ -160,7 +160,7 @@ class MyParser {
     
     /* Process one items-???.xml file.
      */
-    static void processFile(File xmlFile) {
+    static void processFile(File xmlFile) throws Exception {
         Document doc = null;
         try {
             doc = builder.parse(xmlFile);
@@ -186,10 +186,47 @@ class MyParser {
         
         
         /**************************************************************/
-        
+
+        Element root = doc.getDocumentElement();
+        Element[] elements = getElementsByTagNameNR(root, "Item");
+        int length = elements.length;
+
+        for (int i = 0; i < 20; i++) {
+            Element e = elements[i];
+
+            //TODO: REFACTOR THIS SHIT
+            String itemID = e.getAttribute("ItemID");
+            String name = getElementTextByTagNameNR(e, "Name");
+            String currently = strip(getElementTextByTagNameNR(e, "Currently"));
+            String buyPrice = strip(getElementTextByTagNameNR(e, "Buy_Price"));
+            if (buyPrice.equals("")) {
+                buyPrice = "\\N";
+            }
+            String firstBid = strip(getElementTextByTagNameNR(e, "First_Bid"));
+            String numOfBids = getElementTextByTagNameNR(e, "Number_of_Bids");
+            String location = getElementTextByTagNameNR(e, "Location");
+            String country = getElementTextByTagNameNR(e, "Country");
+
+            String started = getElementTextByTagNameNR(e, "Started");
+            SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat inputFormat = new SimpleDateFormat("MMM-dd-yy HH:mm:ss");
+            Date startedDate = inputFormat.parse(started);
+            String startedParsed = outputFormat.format(startedDate);
+
+            String ends = getElementTextByTagNameNR(e, "Ends");
+            Date endsDate = inputFormat.parse(ends);
+            String endsParsed = outputFormat.format(endsDate);
+
+            Element seller = getElementByTagNameNR(e, "Seller");
+            String userID = seller.getAttribute("UserID");
+
+            String description = getElementTextByTagNameNR(e, "Description");
+
+            System.out.printf(startedParsed + " " + endsParsed + "\n");
+        }
     }
     
-    public static void main (String[] args) {
+    public static void main (String[] args) throws Exception {
         if (args.length == 0) {
             System.out.println("Usage: java MyParser [file] [file] ...");
             System.exit(1);
