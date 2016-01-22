@@ -2,7 +2,7 @@ Part B
 
 1.
 
-1) Items (ItemID, Name, Currently, Buy_Price, First_Bid, Number_of_Bids, Started, Ends, UserID, Description, Location, Country)
+1) Items (ItemID, Name, Currently, Buy_Price, First_Bid, Number_of_Bids, Location, Country, Started, Ends, UserID, Description)
 key: ItemID
 
 2) ItemLocation (Location, Country, Latitude, Longitude) 
