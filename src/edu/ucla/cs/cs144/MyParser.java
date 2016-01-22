@@ -157,7 +157,54 @@ class MyParser {
             return nf.format(am).substring(1);
         }
     }
-    
+
+    static Map<String, String> itemTreeToMap(Element e) throws Exception {
+        Map<String, String> map = new HashMap<String, String>();
+
+        String itemID = e.getAttribute("ItemID");
+        String name = getElementTextByTagNameNR(e, "Name");
+        String currently = strip(getElementTextByTagNameNR(e, "Currently"));
+        String buyPrice = strip(getElementTextByTagNameNR(e, "Buy_Price"));
+        if (buyPrice.equals("")) {
+            buyPrice = "\\N";
+        }
+        String firstBid = strip(getElementTextByTagNameNR(e, "First_Bid"));
+        String numOfBids = getElementTextByTagNameNR(e, "Number_of_Bids");
+        String location = getElementTextByTagNameNR(e, "Location");
+        String country = getElementTextByTagNameNR(e, "Country");
+
+        String started = getElementTextByTagNameNR(e, "Started");
+        SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat inputFormat = new SimpleDateFormat("MMM-dd-yy HH:mm:ss");
+        Date startedDate = inputFormat.parse(started);
+        String startedParsed = outputFormat.format(startedDate);
+
+        String ends = getElementTextByTagNameNR(e, "Ends");
+        Date endsDate = inputFormat.parse(ends);
+        String endsParsed = outputFormat.format(endsDate);
+
+        Element seller = getElementByTagNameNR(e, "Seller");
+        String userID = seller.getAttribute("UserID");
+
+        String description = getElementTextByTagNameNR(e, "Description");
+        description = description.substring(0, Math.min(4000, description.length()));
+
+        map.put("ItemID", itemID);
+        map.put("Name", name);
+        map.put("Currently", currently);
+        map.put("Buy_Price", buyPrice);
+        map.put("First_Bid", firstBid);
+        map.put("Number_of_Bids", numOfBids);
+        map.put("Location", location);
+        map.put("Country", country);
+        map.put("Started", started);
+        map.put("Ends", ends);
+        map.put("UserID", userID);
+        map.put("Description", description);
+
+        return map;
+    }
+
     /* Process one items-???.xml file.
      */
     static void processFile(File xmlFile) throws Exception {
@@ -192,40 +239,14 @@ class MyParser {
         int length = elements.length;
 
         for (int i = 0; i < 20; i++) {
-            Element e = elements[i];
+            Map<String, String> itemMap = itemTreeToMap(elements[i]);
 
-            //TODO: REFACTOR THIS SHIT
-            String itemID = e.getAttribute("ItemID");
-            String name = getElementTextByTagNameNR(e, "Name");
-            String currently = strip(getElementTextByTagNameNR(e, "Currently"));
-            String buyPrice = strip(getElementTextByTagNameNR(e, "Buy_Price"));
-            if (buyPrice.equals("")) {
-                buyPrice = "\\N";
+            for (Map.Entry<String, String> entry : itemMap.entrySet()) {
+                System.out.println(entry.getKey() + ": " + entry.getValue());
             }
-            String firstBid = strip(getElementTextByTagNameNR(e, "First_Bid"));
-            String numOfBids = getElementTextByTagNameNR(e, "Number_of_Bids");
-            String location = getElementTextByTagNameNR(e, "Location");
-            String country = getElementTextByTagNameNR(e, "Country");
-
-            String started = getElementTextByTagNameNR(e, "Started");
-            SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            SimpleDateFormat inputFormat = new SimpleDateFormat("MMM-dd-yy HH:mm:ss");
-            Date startedDate = inputFormat.parse(started);
-            String startedParsed = outputFormat.format(startedDate);
-
-            String ends = getElementTextByTagNameNR(e, "Ends");
-            Date endsDate = inputFormat.parse(ends);
-            String endsParsed = outputFormat.format(endsDate);
-
-            Element seller = getElementByTagNameNR(e, "Seller");
-            String userID = seller.getAttribute("UserID");
-
-            String description = getElementTextByTagNameNR(e, "Description");
-
-            System.out.printf(startedParsed + " " + endsParsed + "\n");
         }
     }
-    
+
     public static void main (String[] args) throws Exception {
         if (args.length == 0) {
             System.out.println("Usage: java MyParser [file] [file] ...");
