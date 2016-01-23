@@ -14,7 +14,10 @@ key: (ItemID, Category)
 4) Bids (ItemID, UserID, Time, Amount)
 key: (ItemID, UserID, Time)
 
-5) Users (UserID, Seller_Rating, Bidder_Rating, Location, Country)
+5) Bidders (UserID, Bidder_Rating, Location, Country)
+key: UserID
+
+6) Sellers (UserID, Seller_Rating)
 key: UserID
 
 2.

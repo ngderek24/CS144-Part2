@@ -244,8 +244,29 @@ class MyParser {
         writeToFile(fileName, line);
     }
 
-    static void processUsersTable(Element e, String fileName) throws Exception {
+    static void processSellersTable(Element e, String fileName) throws Exception {
+        Element seller = getElementByTagNameNR(e, "Seller");
+        String userID = seller.getAttribute("UserID");
+        String sellerRating = seller.getAttribute("Rating");
 
+        String line = String.format("%s\t%s\n", userID, sellerRating);
+
+        writeToFile(fileName, line);
+    }
+
+    static void processBiddersTable(Element e, String fileName) throws Exception {
+        Element bids = getElementByTagNameNR(e, "Bids");
+        Element[] bidElements = getElementsByTagNameNR(bids, "Bid");
+        for (Element bid : bidElements) {
+            Element bidder = getElementByTagNameNR(bid, "Bidder");
+            String userID = bidder.getAttribute("UserID");
+            String bidderRating = bidder.getAttribute("Rating");
+            String location = getElementTextByTagNameNR(bidder, "Location");
+            String country = getElementTextByTagNameNR(bidder, "Country");
+
+            String line = String.format("%s\t%s\t\"%s\"\t%s\n", userID, bidderRating, location, country);
+            writeToFile(fileName, line);
+        }
     }
 
     /* Process one items-???.xml file.
@@ -282,14 +303,16 @@ class MyParser {
         openFile("items.csv");
         openFile("location-info.csv");
         openFile("item-category.csv");
-        openFile("users.csv");
+        openFile("sellers.csv");
+        openFile("bidders.csv");
 
         for (int i = 0; i < 5; i++) {
             Element e = elements[i];
             processItemsTable(e, "items.csv");
             processLocationInfoTable(e, "location-info.csv");
             processItemCategoryTable(e, "item-category.csv");
-            processUsersTable(e, "users.csv");
+            processSellersTable(e, "sellers.csv");
+            processBiddersTable(e, "bidders.csv");
         }
     }
 
