@@ -177,14 +177,18 @@ class MyParser {
         bufferedWriter.close();
     }
 
-    static void processItemsTable(Element e, String fileName) throws Exception {
+    private static String filterNullString(String s) {
+        if (s.equals("")) {
+            s = "\\N";
+        }
+        return s;
+    }
+
+    private static void processItemsTable(Element e, String fileName) throws Exception {
         String itemID = e.getAttribute("ItemID");
         String name = getElementTextByTagNameNR(e, "Name");
         String currently = strip(getElementTextByTagNameNR(e, "Currently"));
-        String buyPrice = strip(getElementTextByTagNameNR(e, "Buy_Price"));
-        if (buyPrice.equals("")) {
-            buyPrice = "\\N";
-        }
+        String buyPrice = filterNullString(strip(getElementTextByTagNameNR(e, "Buy_Price")));
         String firstBid = strip(getElementTextByTagNameNR(e, "First_Bid"));
         String numOfBids = getElementTextByTagNameNR(e, "Number_of_Bids");
         String location = getElementTextByTagNameNR(e, "Location");
@@ -213,27 +217,21 @@ class MyParser {
         writeToFile(fileName, line);
     }
 
-    static void processLocationInfoTable(Element e, String fileName) throws Exception {
+    private static void processLocationInfoTable(Element e, String fileName) throws Exception {
         String location = getElementTextByTagNameNR(e, "Location");
         String country = getElementTextByTagNameNR(e, "Country");
         Element locationElement = getElementByTagNameNR(e, "Location");
 
-        String latitude = locationElement.getAttribute("Latitude");
-        if (latitude.equals("")) {
-            latitude = "\\N";
-        }
+        String latitude = filterNullString(locationElement.getAttribute("Latitude"));
 
-        String longitude = locationElement.getAttribute("Longitude");
-        if (longitude.equals("")) {
-            longitude = "\\N";
-        }
+        String longitude = filterNullString(locationElement.getAttribute("Longitude"));
 
         String line = String.format("\"%s\"\t%s\t%s\t%s\n", location, country, latitude, longitude);
 
         writeToFile(fileName, line);
     }
 
-    static void processItemCategoryTable(Element e, String fileName) throws Exception {
+    private static void processItemCategoryTable(Element e, String fileName) throws Exception {
         String itemID = e.getAttribute("ItemID");
         Element[] categories = getElementsByTagNameNR(e, "Category");
         String line = "";
@@ -244,7 +242,7 @@ class MyParser {
         writeToFile(fileName, line);
     }
 
-    static void processSellersTable(Element e, String fileName) throws Exception {
+    private static void processSellersTable(Element e, String fileName) throws Exception {
         Element seller = getElementByTagNameNR(e, "Seller");
         String userID = seller.getAttribute("UserID");
         String sellerRating = seller.getAttribute("Rating");
@@ -254,7 +252,7 @@ class MyParser {
         writeToFile(fileName, line);
     }
 
-    static void processBiddersTable(Element e, String fileName) throws Exception {
+    private static void processBiddersTable(Element e, String fileName) throws Exception {
         Element bids = getElementByTagNameNR(e, "Bids");
         Element[] bidElements = getElementsByTagNameNR(bids, "Bid");
         for (Element bid : bidElements) {
@@ -262,22 +260,16 @@ class MyParser {
             String userID = bidder.getAttribute("UserID");
             String bidderRating = bidder.getAttribute("Rating");
 
-            String location = getElementTextByTagNameNR(bidder, "Location");
-            if (location.equals("")) {
-                location = "\\N";
-            }
+            String location = filterNullString(getElementTextByTagNameNR(bidder, "Location"));
 
-            String country = getElementTextByTagNameNR(bidder, "Country");
-            if (country.equals("")) {
-                country = "\\N";
-            }
+            String country = filterNullString(getElementTextByTagNameNR(bidder, "Country"));
 
             String line = String.format("%s\t%s\t\"%s\"\t%s\n", userID, bidderRating, location, country);
             writeToFile(fileName, line);
         }
     }
 
-    static void processBidsTable(Element e, String fileName) throws Exception {
+    private static void processBidsTable(Element e, String fileName) throws Exception {
         String itemID = e.getAttribute("ItemID");
         Element bids = getElementByTagNameNR(e, "Bids");
         Element[] bidElements = getElementsByTagNameNR(bids, "Bid");
@@ -337,7 +329,7 @@ class MyParser {
         openFile("bidders.csv");
         openFile("bids.csv");
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < length; i++) {
             Element e = elements[i];
             processItemsTable(e, "items.csv");
             processLocationInfoTable(e, "location-info.csv");
