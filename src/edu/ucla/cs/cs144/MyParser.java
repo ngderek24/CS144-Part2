@@ -28,6 +28,7 @@ package edu.ucla.cs.cs144;
 import java.io.*;
 import java.text.*;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.FactoryConfigurationError;
@@ -170,6 +171,12 @@ class MyParser {
         }
     }
 
+    static void writeToFile(String fileName, String line) throws Exception {
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName, true));
+        bufferedWriter.write(line);
+        bufferedWriter.close();
+    }
+
     static void processItemsTable(Element e, String fileName) throws Exception {
         String itemID = e.getAttribute("ItemID");
         String name = getElementTextByTagNameNR(e, "Name");
@@ -203,9 +210,7 @@ class MyParser {
                 itemID, name, currently, buyPrice, firstBid, numOfBids,
                 location, country, started, ends, userID, description);
 
-        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName, true));
-        bufferedWriter.write(line);
-        bufferedWriter.close();
+        writeToFile(fileName, line);
     }
 
     static void processLocationInfoTable(Element e, String fileName) throws Exception {
@@ -225,9 +230,22 @@ class MyParser {
 
         String line = String.format("\"%s\"\t%s\t%s\t%s\n", location, country, latitude, longitude);
 
-        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName, true));
-        bufferedWriter.write(line);
-        bufferedWriter.close();
+        writeToFile(fileName, line);
+    }
+
+    static void processItemCategoryTable(Element e, String fileName) throws Exception {
+        String itemID = e.getAttribute("ItemID");
+        Element[] categories = getElementsByTagNameNR(e, "Category");
+        String line = "";
+        for (Element category : categories) {
+            line += String.format("%s\t%s\n", itemID, getElementText(category));
+        }
+
+        writeToFile(fileName, line);
+    }
+
+    static void processUsersTable(Element e, String fileName) throws Exception {
+
     }
 
     /* Process one items-???.xml file.
@@ -263,11 +281,15 @@ class MyParser {
 
         openFile("items.csv");
         openFile("location-info.csv");
+        openFile("item-category.csv");
+        openFile("users.csv");
 
         for (int i = 0; i < 5; i++) {
             Element e = elements[i];
             processItemsTable(e, "items.csv");
             processLocationInfoTable(e, "location-info.csv");
+            processItemCategoryTable(e, "item-category.csv");
+            processUsersTable(e, "users.csv");
         }
     }
 
