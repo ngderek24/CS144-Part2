@@ -160,14 +160,19 @@ class MyParser {
     }
 
     static void openFile(String fileName) {
-        Writer writer = null;
-        try {
-            writer = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(fileName), "utf-8"));
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        } finally {
-            try {writer.close();} catch (Exception ex) {/*ignore*/}
+        File file = new File(fileName);
+        if (!file.exists()) {
+            Writer writer = null;
+            try {
+                writer = new BufferedWriter(new OutputStreamWriter(
+                        new FileOutputStream(fileName), "utf-8"));
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            } finally {
+                try {
+                    writer.close();
+                } catch (Exception ex) {/*ignore*/}
+            }
         }
     }
 
