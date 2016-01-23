@@ -203,7 +203,28 @@ class MyParser {
                 itemID, name, currently, buyPrice, firstBid, numOfBids,
                 location, country, started, ends, userID, description);
 
-        //System.out.println(line);
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName, true));
+        bufferedWriter.write(line);
+        bufferedWriter.close();
+    }
+
+    static void processLocationInfoTable(Element e, String fileName) throws Exception {
+        String location = getElementTextByTagNameNR(e, "Location");
+        String country = getElementTextByTagNameNR(e, "Country");
+        Element locationElement = getElementByTagNameNR(e, "Location");
+
+        String latitude = locationElement.getAttribute("Latitude");
+        if (latitude.equals("")) {
+            latitude = "\\N";
+        }
+
+        String longitude = locationElement.getAttribute("Longitude");
+        if (longitude.equals("")) {
+            longitude = "\\N";
+        }
+
+        String line = String.format("\"%s\"\t%s\t%s\t%s\n", location, country, latitude, longitude);
+
         BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName, true));
         bufferedWriter.write(line);
         bufferedWriter.close();
@@ -241,10 +262,12 @@ class MyParser {
         int length = elements.length;
 
         openFile("items.csv");
+        openFile("location-info.csv");
 
         for (int i = 0; i < 5; i++) {
             Element e = elements[i];
             processItemsTable(e, "items.csv");
+            processLocationInfoTable(e, "location-info.csv");
         }
     }
 
