@@ -158,9 +158,19 @@ class MyParser {
         }
     }
 
-    static Map<String, String> itemTreeToMap(Element e) throws Exception {
-        Map<String, String> map = new HashMap<String, String>();
+    static void openFile(String fileName) {
+        Writer writer = null;
+        try {
+            writer = new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream(fileName), "utf-8"));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } finally {
+            try {writer.close();} catch (Exception ex) {/*ignore*/}
+        }
+    }
 
+    static void processItemsTable(Element e, String fileName) throws Exception {
         String itemID = e.getAttribute("ItemID");
         String name = getElementTextByTagNameNR(e, "Name");
         String currently = strip(getElementTextByTagNameNR(e, "Currently"));
@@ -189,20 +199,14 @@ class MyParser {
         String description = getElementTextByTagNameNR(e, "Description");
         description = description.substring(0, Math.min(4000, description.length()));
 
-        map.put("ItemID", itemID);
-        map.put("Name", name);
-        map.put("Currently", currently);
-        map.put("Buy_Price", buyPrice);
-        map.put("First_Bid", firstBid);
-        map.put("Number_of_Bids", numOfBids);
-        map.put("Location", location);
-        map.put("Country", country);
-        map.put("Started", started);
-        map.put("Ends", ends);
-        map.put("UserID", userID);
-        map.put("Description", description);
+        String line = String.format("%s\t%s\t%s\t%s\t%s\t%s\t\"%s\"\t%s\t%s\t%s\t%s\t\"%s\"\n",
+                itemID, name, currently, buyPrice, firstBid, numOfBids,
+                location, country, started, ends, userID, description);
 
-        return map;
+        //System.out.println(line);
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName, true));
+        bufferedWriter.write(line);
+        bufferedWriter.close();
     }
 
     /* Process one items-???.xml file.
@@ -229,21 +233,18 @@ class MyParser {
         
         /* Fill in code here (you will probably need to write auxiliary
             methods). */
-        
-        
-        
+
         /**************************************************************/
 
         Element root = doc.getDocumentElement();
         Element[] elements = getElementsByTagNameNR(root, "Item");
         int length = elements.length;
 
-        for (int i = 0; i < 20; i++) {
-            Map<String, String> itemMap = itemTreeToMap(elements[i]);
+        openFile("test.txt");
 
-            for (Map.Entry<String, String> entry : itemMap.entrySet()) {
-                System.out.println(entry.getKey() + ": " + entry.getValue());
-            }
+        for (int i = 0; i < 5; i++) {
+            Element e = elements[i];
+            processItemsTable(e, "test.txt");
         }
     }
 
