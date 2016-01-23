@@ -240,11 +240,11 @@ class MyParser {
         Element[] elements = getElementsByTagNameNR(root, "Item");
         int length = elements.length;
 
-        openFile("test.txt");
+        openFile("items.csv");
 
         for (int i = 0; i < 5; i++) {
             Element e = elements[i];
-            processItemsTable(e, "test.txt");
+            processItemsTable(e, "items.csv");
         }
     }
 
