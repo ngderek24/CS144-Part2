@@ -28,6 +28,7 @@ package edu.ucla.cs.cs144;
 import java.io.*;
 import java.text.*;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.FactoryConfigurationError;
@@ -157,7 +158,144 @@ class MyParser {
             return nf.format(am).substring(1);
         }
     }
-    
+
+    static void openFile(String fileName) {
+        File file = new File(fileName);
+        if (!file.exists()) {
+            Writer writer = null;
+            try {
+                writer = new BufferedWriter(new OutputStreamWriter(
+                        new FileOutputStream(fileName), "utf-8"));
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            } finally {
+                try {
+                    writer.close();
+                } catch (Exception ex) {/*ignore*/}
+            }
+        }
+    }
+
+    static void writeToFile(String fileName, String line) throws Exception {
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName, true));
+        bufferedWriter.write(line);
+        bufferedWriter.close();
+    }
+
+    private static String filterNullString(String s) {
+        if (s.equals("")) {
+            s = "\\N";
+        }
+        return s;
+    }
+
+    private static void processItemsTable(Element e, String fileName) throws Exception {
+        String itemID = e.getAttribute("ItemID");
+        String name = getElementTextByTagNameNR(e, "Name");
+        String currently = strip(getElementTextByTagNameNR(e, "Currently"));
+        String buyPrice = filterNullString(strip(getElementTextByTagNameNR(e, "Buy_Price")));
+        String firstBid = strip(getElementTextByTagNameNR(e, "First_Bid"));
+        String numOfBids = getElementTextByTagNameNR(e, "Number_of_Bids");
+        String location = getElementTextByTagNameNR(e, "Location");
+        String country = getElementTextByTagNameNR(e, "Country");
+
+        String started = getElementTextByTagNameNR(e, "Started");
+        SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat inputFormat = new SimpleDateFormat("MMM-dd-yy HH:mm:ss");
+        Date startedDate = inputFormat.parse(started);
+        String startedParsed = outputFormat.format(startedDate);
+
+        String ends = getElementTextByTagNameNR(e, "Ends");
+        Date endsDate = inputFormat.parse(ends);
+        String endsParsed = outputFormat.format(endsDate);
+
+        Element seller = getElementByTagNameNR(e, "Seller");
+        String userID = seller.getAttribute("UserID");
+
+        String description = getElementTextByTagNameNR(e, "Description");
+        description = description.substring(0, Math.min(4000, description.length()));
+
+        String line = String.format("%s\t%s\t%s\t%s\t%s\t%s\t\"%s\"\t%s\t%s\t%s\t%s\t\"%s\"\n",
+                itemID, name, currently, buyPrice, firstBid, numOfBids,
+                location, country, started, ends, userID, description);
+
+        writeToFile(fileName, line);
+    }
+
+    private static void processLocationInfoTable(Element e, String fileName) throws Exception {
+        String location = getElementTextByTagNameNR(e, "Location");
+        String country = getElementTextByTagNameNR(e, "Country");
+        Element locationElement = getElementByTagNameNR(e, "Location");
+
+        String latitude = filterNullString(locationElement.getAttribute("Latitude"));
+
+        String longitude = filterNullString(locationElement.getAttribute("Longitude"));
+
+        String line = String.format("\"%s\"\t%s\t%s\t%s\n", location, country, latitude, longitude);
+
+        writeToFile(fileName, line);
+    }
+
+    private static void processItemCategoryTable(Element e, String fileName) throws Exception {
+        String itemID = e.getAttribute("ItemID");
+        Element[] categories = getElementsByTagNameNR(e, "Category");
+        String line = "";
+        for (Element category : categories) {
+            line += String.format("%s\t%s\n", itemID, getElementText(category));
+        }
+
+        writeToFile(fileName, line);
+    }
+
+    private static void processSellersTable(Element e, String fileName) throws Exception {
+        Element seller = getElementByTagNameNR(e, "Seller");
+        String userID = seller.getAttribute("UserID");
+        String sellerRating = seller.getAttribute("Rating");
+
+        String line = String.format("%s\t%s\n", userID, sellerRating);
+
+        writeToFile(fileName, line);
+    }
+
+    private static void processBiddersTable(Element e, String fileName) throws Exception {
+        Element bids = getElementByTagNameNR(e, "Bids");
+        Element[] bidElements = getElementsByTagNameNR(bids, "Bid");
+        for (Element bid : bidElements) {
+            Element bidder = getElementByTagNameNR(bid, "Bidder");
+            String userID = bidder.getAttribute("UserID");
+            String bidderRating = bidder.getAttribute("Rating");
+
+            String location = filterNullString(getElementTextByTagNameNR(bidder, "Location"));
+
+            String country = filterNullString(getElementTextByTagNameNR(bidder, "Country"));
+
+            String line = String.format("%s\t%s\t\"%s\"\t%s\n", userID, bidderRating, location, country);
+            writeToFile(fileName, line);
+        }
+    }
+
+    private static void processBidsTable(Element e, String fileName) throws Exception {
+        String itemID = e.getAttribute("ItemID");
+        Element bids = getElementByTagNameNR(e, "Bids");
+        Element[] bidElements = getElementsByTagNameNR(bids, "Bid");
+        for (Element bid : bidElements) {
+            Element bidder = getElementByTagNameNR(bid, "Bidder");
+            String userID = bidder.getAttribute("UserID");
+
+            String time = getElementTextByTagNameNR(bid, "Time");
+            SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat inputFormat = new SimpleDateFormat("MMM-dd-yy HH:mm:ss");
+            Date timeDate = inputFormat.parse(time);
+            String timeParsed = outputFormat.format(timeDate);
+
+            String amount = strip(getElementTextByTagNameNR(bid, "Amount"));
+
+            String line = String.format("%s\t%s\t%s\t%s\n", itemID, userID, timeParsed, amount);
+            writeToFile(fileName, line);
+        }
+
+    }
+
     /* Process one items-???.xml file.
      */
     static void processFile(File xmlFile) throws Exception {
@@ -182,50 +320,31 @@ class MyParser {
         
         /* Fill in code here (you will probably need to write auxiliary
             methods). */
-        
-        
-        
+
         /**************************************************************/
 
         Element root = doc.getDocumentElement();
         Element[] elements = getElementsByTagNameNR(root, "Item");
         int length = elements.length;
 
-        for (int i = 0; i < 20; i++) {
+        openFile("items.csv");
+        openFile("location-info.csv");
+        openFile("item-category.csv");
+        openFile("sellers.csv");
+        openFile("bidders.csv");
+        openFile("bids.csv");
+
+        for (int i = 0; i < length; i++) {
             Element e = elements[i];
-
-            //TODO: REFACTOR THIS SHIT
-            String itemID = e.getAttribute("ItemID");
-            String name = getElementTextByTagNameNR(e, "Name");
-            String currently = strip(getElementTextByTagNameNR(e, "Currently"));
-            String buyPrice = strip(getElementTextByTagNameNR(e, "Buy_Price"));
-            if (buyPrice.equals("")) {
-                buyPrice = "\\N";
-            }
-            String firstBid = strip(getElementTextByTagNameNR(e, "First_Bid"));
-            String numOfBids = getElementTextByTagNameNR(e, "Number_of_Bids");
-            String location = getElementTextByTagNameNR(e, "Location");
-            String country = getElementTextByTagNameNR(e, "Country");
-
-            String started = getElementTextByTagNameNR(e, "Started");
-            SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            SimpleDateFormat inputFormat = new SimpleDateFormat("MMM-dd-yy HH:mm:ss");
-            Date startedDate = inputFormat.parse(started);
-            String startedParsed = outputFormat.format(startedDate);
-
-            String ends = getElementTextByTagNameNR(e, "Ends");
-            Date endsDate = inputFormat.parse(ends);
-            String endsParsed = outputFormat.format(endsDate);
-
-            Element seller = getElementByTagNameNR(e, "Seller");
-            String userID = seller.getAttribute("UserID");
-
-            String description = getElementTextByTagNameNR(e, "Description");
-
-            System.out.printf(startedParsed + " " + endsParsed + "\n");
+            processItemsTable(e, "items.csv");
+            processLocationInfoTable(e, "location-info.csv");
+            processItemCategoryTable(e, "item-category.csv");
+            processSellersTable(e, "sellers.csv");
+            processBiddersTable(e, "bidders.csv");
+            processBidsTable(e, "bids.csv");
         }
     }
-    
+
     public static void main (String[] args) throws Exception {
         if (args.length == 0) {
             System.out.println("Usage: java MyParser [file] [file] ...");
