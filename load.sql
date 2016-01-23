@@ -31,3 +31,51 @@ create table LocationInfo (
 -- Load location-info.csv into table --
 LOAD DATA LOCAL INFILE '~/shared/project2/CS144-Part2/location-info.csv' 
 INTO TABLE LocationInfo FIELDS TERMINATED BY '\t' OPTIONALLY ENCLOSED BY '"';
+
+-- Create table --
+create table ItemCategory (
+	ItemID varchar(10) not null,
+	Category varchar(40) not null,
+	primary key (ItemID, Category)
+);
+
+-- Load location-info.csv into table --
+LOAD DATA LOCAL INFILE '~/shared/project2/CS144-Part2/item-category.csv' 
+INTO TABLE ItemCategory FIELDS TERMINATED BY '\t' OPTIONALLY ENCLOSED BY '"';
+
+-- Create table --
+create table Sellers (
+	UserID varchar(30) not null,
+	SellerRating int not null,
+	primary key (UserID)
+);
+
+-- Load location-info.csv into table --
+LOAD DATA LOCAL INFILE '~/shared/project2/CS144-Part2/sellers.csv' 
+INTO TABLE Sellers FIELDS TERMINATED BY '\t' OPTIONALLY ENCLOSED BY '"';
+
+-- Create table --
+create table Bidders (
+	UserID varchar(30) not null,
+	BidderRating int not null,
+	Location varchar(50),
+	Country varchar(20),
+	primary key (UserID)
+);
+
+-- Load location-info.csv into table --
+LOAD DATA LOCAL INFILE '~/shared/project2/CS144-Part2/bidders.csv' 
+INTO TABLE Bidders FIELDS TERMINATED BY '\t' OPTIONALLY ENCLOSED BY '"';
+
+-- Create table --
+create table Bids (
+	ItemID varchar(10) not null,
+	UserID varchar(30) not null,
+	Time timestamp not null,
+	Amount decimal(8,2) not null,
+	primary key (ItemID, UserID, Time)
+);
+
+-- Load location-info.csv into table --
+LOAD DATA LOCAL INFILE '~/shared/project2/CS144-Part2/bids.csv' 
+INTO TABLE Bids FIELDS TERMINATED BY '\t' OPTIONALLY ENCLOSED BY '"';

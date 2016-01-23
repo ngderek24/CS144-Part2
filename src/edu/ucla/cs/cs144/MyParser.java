@@ -277,6 +277,28 @@ class MyParser {
         }
     }
 
+    static void processBidsTable(Element e, String fileName) throws Exception {
+        String itemID = e.getAttribute("ItemID");
+        Element bids = getElementByTagNameNR(e, "Bids");
+        Element[] bidElements = getElementsByTagNameNR(bids, "Bid");
+        for (Element bid : bidElements) {
+            Element bidder = getElementByTagNameNR(bid, "Bidder");
+            String userID = bidder.getAttribute("UserID");
+
+            String time = getElementTextByTagNameNR(bid, "Time");
+            SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat inputFormat = new SimpleDateFormat("MMM-dd-yy HH:mm:ss");
+            Date timeDate = inputFormat.parse(time);
+            String timeParsed = outputFormat.format(timeDate);
+
+            String amount = strip(getElementTextByTagNameNR(bid, "Amount"));
+
+            String line = String.format("%s\t%s\t%s\t%s\n", itemID, userID, timeParsed, amount);
+            writeToFile(fileName, line);
+        }
+
+    }
+
     /* Process one items-???.xml file.
      */
     static void processFile(File xmlFile) throws Exception {
@@ -313,6 +335,7 @@ class MyParser {
         openFile("item-category.csv");
         openFile("sellers.csv");
         openFile("bidders.csv");
+        openFile("bids.csv");
 
         for (int i = 0; i < 5; i++) {
             Element e = elements[i];
@@ -321,6 +344,7 @@ class MyParser {
             processItemCategoryTable(e, "item-category.csv");
             processSellersTable(e, "sellers.csv");
             processBiddersTable(e, "bidders.csv");
+            processBidsTable(e, "bids.csv");
         }
     }
 
