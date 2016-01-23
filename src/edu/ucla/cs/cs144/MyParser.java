@@ -261,8 +261,16 @@ class MyParser {
             Element bidder = getElementByTagNameNR(bid, "Bidder");
             String userID = bidder.getAttribute("UserID");
             String bidderRating = bidder.getAttribute("Rating");
+
             String location = getElementTextByTagNameNR(bidder, "Location");
+            if (location.equals("")) {
+                location = "\\N";
+            }
+
             String country = getElementTextByTagNameNR(bidder, "Country");
+            if (country.equals("")) {
+                country = "\\N";
+            }
 
             String line = String.format("%s\t%s\t\"%s\"\t%s\n", userID, bidderRating, location, country);
             writeToFile(fileName, line);
