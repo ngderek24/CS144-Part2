@@ -217,7 +217,7 @@ class MyParser {
 
         String line = String.format("%s\t%s\t%s\t%s\t%s\t%s\t\"%s\"\t%s\t%s\t%s\t%s\t\"%s\"\n",
                 itemID, name, currently, buyPrice, firstBid, numOfBids,
-                location, country, started, ends, userID, description);
+                location, country, startedParsed, endsParsed, userID, description);
 
         writeToFile(fileName, line);
     }
