@@ -12,7 +12,7 @@ select count(*) from
 	group by ItemID 
 	having count(*) = 4) as T;
 
--- 4 --
+-- 4 done --
 select ItemID from Items 
 where Ends > '2001-12-20 00:00:01'
 and Number_of_Bids > 0
@@ -29,3 +29,10 @@ where SellerRating > 1000;
 select count(*) from Sellers s, Bidders b 
 where s.UserID = b.UserID;
 
+-- 7 done --
+select count(*) from 
+(select count(*) from Items i, ItemCategory c
+	where i.ItemID = c.ItemID
+		and Number_of_Bids > 0
+		and Currently > 100
+	group by Category) as T;
