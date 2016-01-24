@@ -4,7 +4,7 @@ select count(*) from
 
 -- 2 off by 1 --
 select count(*) from Items 
-where Location = "New York";
+where binary Location = "New York";
 
 -- 3 done --
 select count(*) from 
@@ -31,8 +31,8 @@ where s.UserID = b.UserID;
 
 -- 7 done --
 select count(*) from 
-(select count(*) from Items i, ItemCategory c
-	where i.ItemID = c.ItemID
-		and Number_of_Bids > 0
-		and Currently > 100
+(select Category from Items i, ItemCategory c 
+	where i.ItemID = c.ItemID 
+	and Number_of_Bids > 0 
+	and Currently > 100 
 	group by Category) as T;
