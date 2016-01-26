@@ -20,7 +20,7 @@ key: UserID
 6) Sellers (UserID, Seller_Rating)
 key: UserID
 
-2.
+2. Our relations do not contain any completely nontrivial functional dependencies that do not effectively specify keys.
 
 3. Yes, they are in Boyce-Codd Normal Form. 
 

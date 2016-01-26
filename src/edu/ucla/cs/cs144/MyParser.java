@@ -215,7 +215,7 @@ class MyParser {
         String description = getElementTextByTagNameNR(e, "Description");
         description = description.substring(0, Math.min(4000, description.length()));
 
-        String line = String.format("%s\t%s\t%s\t%s\t%s\t%s\t\"%s\"\t%s\t%s\t%s\t%s\t\"%s\"\n",
+        String line = String.format("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
                 itemID, name, currently, buyPrice, firstBid, numOfBids,
                 location, country, startedParsed, endsParsed, userID, description);
 
