@@ -231,7 +231,7 @@ class MyParser {
 
         String longitude = filterNullString(locationElement.getAttribute("Longitude"));
 
-        String line = String.format("\"%s\"\t%s\t%s\t%s\n", location, country, latitude, longitude);
+        String line = String.format("%s\t%s\t%s\t%s\n", location, country, latitude, longitude);
 
         writeToFile(fileName, line);
     }
@@ -269,7 +269,7 @@ class MyParser {
 
             String country = filterNullString(getElementTextByTagNameNR(bidder, "Country"));
 
-            String line = String.format("%s\t%s\t\"%s\"\t%s\n", userID, bidderRating, location, country);
+            String line = String.format("%s\t%s\t%s\t%s\n", userID, bidderRating, location, country);
             writeToFile(fileName, line);
         }
     }
