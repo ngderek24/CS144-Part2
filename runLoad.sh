@@ -13,7 +13,6 @@ ant run-all
 
 # If the Java code does not handle duplicate removal, do this now
 sort items.csv | uniq > items-uniq.csv
-sort location-info.csv | uniq > location-info-uniq.csv
 sort item-category.csv | uniq > item-category-uniq.csv
 sort sellers.csv | uniq > sellers-uniq.csv
 sort bidders.csv | uniq > bidders-uniq.csv

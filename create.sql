@@ -7,19 +7,13 @@ create table Items (
 	Number_of_Bids int not null,
 	Location varchar(50) not null,
 	Country varchar(20) not null,
+	Latitude decimal(9,6),
+	Longitude decimal(9,6),
 	Started timestamp not null,
 	Ends timestamp not null,
 	UserID varchar(30) not null,
 	Description varchar(4000) not null,
 	primary key (ItemID)
-);
-
-create table LocationInfo (
-	Location varchar(50) not null,
-	Country varchar(20) not null,
-	Latitude decimal(9,6),
-	Longitude decimal(9,6),
-	primary key (Location, Country)
 );
 
 create table ItemCategory (
