@@ -196,8 +196,11 @@ class MyParser {
         String buyPrice = filterNullString(strip(getElementTextByTagNameNR(e, "Buy_Price")));
         String firstBid = strip(getElementTextByTagNameNR(e, "First_Bid"));
         String numOfBids = getElementTextByTagNameNR(e, "Number_of_Bids");
+        Element locationElement = getElementByTagNameNR(e, "Location");
         String location = getElementTextByTagNameNR(e, "Location");
         String country = getElementTextByTagNameNR(e, "Country");
+        String latitude = filterNullString(locationElement.getAttribute("Latitude"));
+        String longitude = filterNullString(locationElement.getAttribute("Longitude"));
 
         String started = getElementTextByTagNameNR(e, "Started");
         SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -215,13 +218,13 @@ class MyParser {
         String description = getElementTextByTagNameNR(e, "Description");
         description = description.substring(0, Math.min(4000, description.length()));
 
-        String line = String.format("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
+        String line = String.format("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
                 itemID, name, currently, buyPrice, firstBid, numOfBids,
-                location, country, startedParsed, endsParsed, userID, description);
+                location, country, latitude, longitude, startedParsed, endsParsed, userID, description);
 
         writeToFile(fileName, line);
     }
-
+    /*
     private static void processLocationInfoTable(Element e, String fileName) throws Exception {
         String location = getElementTextByTagNameNR(e, "Location");
         String country = getElementTextByTagNameNR(e, "Country");
@@ -235,7 +238,7 @@ class MyParser {
 
         writeToFile(fileName, line);
     }
-
+    */
     private static void processItemCategoryTable(Element e, String fileName) throws Exception {
         String itemID = e.getAttribute("ItemID");
         Element[] categories = getElementsByTagNameNR(e, "Category");
@@ -328,7 +331,7 @@ class MyParser {
         int length = elements.length;
 
         openFile("items.csv");
-        openFile("location-info.csv");
+        //openFile("location-info.csv");
         openFile("item-category.csv");
         openFile("sellers.csv");
         openFile("bidders.csv");
@@ -337,7 +340,7 @@ class MyParser {
         for (int i = 0; i < length; i++) {
             Element e = elements[i];
             processItemsTable(e, "items.csv");
-            processLocationInfoTable(e, "location-info.csv");
+            //processLocationInfoTable(e, "location-info.csv");
             processItemCategoryTable(e, "item-category.csv");
             processSellersTable(e, "sellers.csv");
             processBiddersTable(e, "bidders.csv");

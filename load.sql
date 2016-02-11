@@ -1,9 +1,6 @@
 LOAD DATA LOCAL INFILE 'items-uniq.csv' 
 INTO TABLE Items FIELDS TERMINATED BY '\t';
 
-LOAD DATA LOCAL INFILE 'location-info-uniq.csv' 
-INTO TABLE LocationInfo FIELDS TERMINATED BY '\t';
-
 LOAD DATA LOCAL INFILE 'item-category-uniq.csv' 
 INTO TABLE ItemCategory FIELDS TERMINATED BY '\t';
 
